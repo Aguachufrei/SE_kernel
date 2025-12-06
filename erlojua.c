@@ -1,67 +1,52 @@
-#include <stdio>
+#include <stdio.h>
+#include <stdlib.h>
 #include <pthread.h>
-#define MAIZTASUNA = 200;
+#include <semaphore.h>
+#include "scheduler.h"
+#include "erlojua.h"
+#define MAIZTASUNA 1
 
 
+//inicialization
+pthread_mutex_t mutexC = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t cond1 = PTHREAD_COND_INITIALIZER;
+pthread_cond_t cond2 = PTHREAD_COND_INITIALIZER;
+int tmpCount = 3;
+int done = 0;
 
-int main(){
-	//inicialization
-	pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-	pthread_cond_t cond1 = PTHREAD_COND_INITIALIZER;
-	pthread_cond_t cond2 = PTHREAD_COND_INITIALIZER;
-	pid_t, clock, temp1, temp2;
-	int tmpCount = 2;
-	int done = 0;
-	
-
-	//clock
-	clock = fork();
-	if(clock<0){
-		printf("FORK ERROR");
-	} else if(clock ==0){
-erlojua();
-	}
-
-	//temp
-	temp1 = fork();
-	if(temp1<0){
-		printf("FORK ERROR");
-	} else if(temp1 == 0){
-		erlojua();
-	}
-
-	temp2 = fork();
-	if(temp2 < 0){
-		printf("FORK ERROR");
-	} else if(temp2 ==0){
-		erlojua();
-	}
-	
-
-
-
-}
-void erlojua(){
-	while (true) {
-		pthread_mutex_lock(&mutex);
+void *erlojua(){
+	printf("clock initialized\n");
+	while (1) {
+		pthread_mutex_lock(&mutexC);
 		while (tmpCount > done){
-			pthread_cond_wait(&cond1);
-			pthread_mutex_wait(&mutex);
-			//do sth
+			
+			pthread_cond_wait(&cond1, &mutexC);
 		}
-	done = 0; 
-	pthread_cond_signal(&cond2);
-	pthread_mutex_unlock(&mutex);
-}
-void temporizadorea(){
-	while (true) {
-		done++;
-		//do sth
-
-		pthread_cond_signal(&cond);
-		pthread_cond_wait(&cond2);
-		pthrad_mutex_wait(&mutex);
 		
+		printf("\nclk!!");	
+		usleep(300000);
+		done = 0; 
+		pthread_cond_broadcast(&cond2);
+		pthread_mutex_unlock(&mutexC);
 	}
 }
 
+void *tenporizadorea(void *args){
+	struct temp_arg *argstruct = (struct temp_arg *)args;
+	pthread_mutex_lock(&mutexC);
+	int i= 0; 
+	while (1) {
+		i++;	
+		done++;
+		if(i==argstruct->maiztasuna){
+			i = 0;
+			//do sth
+			printf(" <-- tclk ( %d )",argstruct->maiztasuna);
+			if (argstruct->funtzioa != NULL) {
+				argstruct->funtzioa();
+			}
+		}	
+		pthread_cond_signal(&cond1);
+		pthread_cond_wait(&cond2, &mutexC);
+	}
+}
