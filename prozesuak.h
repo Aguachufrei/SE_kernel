@@ -8,7 +8,7 @@ struct PCB {
     int lastTime;
 };
 struct prozesu_ilara_node {
-    struct PCB pc;
+    struct PCB pcb;
     struct prozesu_ilara_node* next;
 };
 struct prozesu_ilara {
@@ -24,4 +24,5 @@ void prozesu_add(struct prozesu_ilara *queue);
 struct PCB prozesu_peek(struct prozesu_ilara *queue);
 struct PCB prozesu_poll(struct prozesu_ilara *queue);
 void prozesu_push(struct prozesu_ilara *queue, struct PCB *pcb);
+struct prozesu_ilara_node* prozesu_get_next(struct prozesu_ilara_node* nodoa);
 #endif

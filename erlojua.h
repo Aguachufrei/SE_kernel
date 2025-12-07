@@ -1,3 +1,6 @@
+#ifndef ERLOJUA_H
+#define ERLOJUA_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -16,3 +19,4 @@ struct temp_arg {
     int maiztasuna;
     void (*funtzioa)(void);
 };
+#endif
