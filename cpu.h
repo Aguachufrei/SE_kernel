@@ -6,8 +6,8 @@
 extern struct CPU cpu;
 struct CPU {
 	int coreNum;
-	int hthreadsNum;
-	struct PCB* hthreads;
+	int hthreadNum;
+	struct PCB ***cores;
 };
-void cpu_inicialize(int core, int hthreads);
-#endif
+void cpu_inicialize(int coreNum, int hthreadNum);
+#endi

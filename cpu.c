@@ -3,10 +3,13 @@
 #include "prozesuak.h"
 #include "cpu.h"
 struct CPU cpu;
-void cpu_inicialize (int core, int hthreads){
+void cpu_inicialize (int coreNum, int hthreadNum){
 	printf("cpu inicialized\n");
-	cpu.coreNum = core;
-	cpu.hthreadsNum = hthreads;
-	cpu.hthreads = calloc(hthreads, sizeof(struct PCB));
+	cpu.coreNum = coreNum;
+	cpu.hthreadNum = hthreadNum;
+	cpu.cores = calloc(coreNum, sizeof(struct PCB**));
+	for(int i = 0; i < coreNum; i++){
+		cpu.cores[i] = calloc(cpu.hthreadNum, sizeof(struct PCB*));
+	}
 }
 

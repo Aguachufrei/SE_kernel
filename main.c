@@ -7,7 +7,7 @@
 #include "scheduler.h"
 int main () {
 	
-	cpu_inicialize(12, 12);	
+	cpu_inicialize(4, 2);	
 	
 	//clock
 	pthread_t clockthread; 

@@ -3,7 +3,6 @@
 #include "prozesuak.h"
 #include "erlojua.h"
 struct prozesu_ilara ready = {.prozesu_kantitatea = 0, .first = NULL, .last = NULL};
-struct prozesu_ilara running = {.prozesu_kantitatea = 0, .first = NULL, .last = NULL};
 int current_id = 0;
 
 void prozesu_add_ready(){
@@ -54,3 +53,8 @@ void prozesu_push(struct prozesu_ilara *queue, struct PCB *pcb){
 struct prozesu_ilara_node *prozesu_get_next(struct prozesu_ilara_node *nodoa){
     return nodoa->next;
 } 
+struct PCB *prozesu_destroy_next(struct prozesu_ilara *queue, struct prozesu_ilara_node *nodoa){
+	struct PCB *current = &nodoa->next->pcb;	
+	nodoa->next = nodoa->next->next;
+	return current;
+}
