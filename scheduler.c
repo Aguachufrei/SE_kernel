@@ -1,8 +1,8 @@
 #include <semaphore.h>
 #include <stdio.h>
 #include <unistd.h>
-#include "prozesuak.h"
-#include "erlojua.h"
+#include "process.h"
+#include "clock.h"
 #include "cpu.h"
 sem_t mutexS;
 
@@ -15,22 +15,22 @@ void *scheduler(void *args) {
 		for(int i = 0; i<cpu.coreNum; i++){
 			for(int j = 0; j<cpu.hthreadNum; j++){
 				if(cpu.cores[i][j]==NULL)continue;
-				prozesu_push(&ready, cpu.cores[i][j]);
+				process_push(&ready, cpu.cores[i][j]);
 			}
 		}
 		for(int i = 0; i<cpu.coreNum; i++){
 			for(int j = 0; j<cpu.hthreadNum; j++){
-				struct prozesu_ilara_node *current = ready.first;
+				struct process_node *current = ready.first;
 				if(current == NULL){
 					continue;
 				}
 
-				struct prozesu_ilara_node *best = current;
-				struct prozesu_ilara_node *previous = current;
-				struct prozesu_ilara_node *previousBest = current;
+				struct process_node *best = current;
+				struct process_node *previous = current;
+				struct process_node *previousBest = current;
 				int max_value = current->pcb.priority + ssa_time - current->pcb.lastTime;        
 
-				while((current = prozesu_get_next(current)) != NULL){
+				while((current = process_get_next(current)) != NULL){
 					if(current->pcb.priority + ssa_time - current->pcb.lastTime > max_value){
 						best = current;
 						previousBest = previous;
@@ -40,12 +40,12 @@ void *scheduler(void *args) {
 				}
 				best->pcb.lastTime = ssa_time;
 				if(best == previousBest){
-					prozesu_poll(&ready);
+					process_poll(&ready);
 				} else { 
-					prozesu_destroy_next(&ready, previousBest);
+					process_destroy_next(&ready, previousBest);
 				}
 				cpu.cores[i][j]=&best->pcb;
-				printqueue(&ready);
+				//process_print(&ready);
 			}
 		}
 	}

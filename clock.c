@@ -4,8 +4,7 @@
 #include <semaphore.h>
 #include <unistd.h>
 #include "scheduler.h"
-#include "erlojua.h"
-#define MAIZTASUNA 1
+#include "clock.h"
 
 
 //inicialization
@@ -16,15 +15,15 @@ int tmpCount = 3;
 int done = 0;
 int ssa_time = 1;
 
-void *erlojua(void *args){
+void *clk(void *args){
 	printf("clock initialized\n");
 	while (1) {
 		pthread_mutex_lock(&mutexC);
 		while (tmpCount > done){
-			
+
 			pthread_cond_wait(&cond1, &mutexC);
 		}
-	    ssa_time++;	
+		ssa_time++;	
 		printf("\nclk(%d): ",ssa_time);	
 		usleep(300000);
 		done = 0; 
@@ -33,19 +32,18 @@ void *erlojua(void *args){
 	}
 }
 
-void *tenporizadorea(void *args){
+void *stopwatch(void *args){
 	struct temp_arg *argstruct = (struct temp_arg *)args;
 	pthread_mutex_lock(&mutexC);
 	int i= 0; 
 	while (1) {
 		i++;	
 		done++;
-		if(i==argstruct->maiztasuna){
+		if(i==argstruct->frequency){
 			i = 0;
-			//do sth
-			printf(" <-- tclk ( %d )",argstruct->maiztasuna);
-			if (argstruct->funtzioa != NULL) {
-				argstruct->funtzioa();
+			printf(" <-- tclk ( %d )",argstruct->frequency);
+			if (argstruct->function != NULL) {
+				argstruct->function();
 			}
 		}	
 		pthread_cond_signal(&cond1);

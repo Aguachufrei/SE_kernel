@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "prozesuak.h"
+#include "process.h"
 #include "cpu.h"
 struct CPU cpu;
 void cpu_inicialize (int coreNum, int hthreadNum){

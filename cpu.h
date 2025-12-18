@@ -2,7 +2,7 @@
 #define CPU_H
 #include <stdio.h>
 #include <stdlib.h>
-#include "prozesuak.h"
+#include "process.h"
 extern struct CPU cpu;
 struct CPU {
 	int coreNum;

@@ -1,8 +1,8 @@
 #include <stdio.h> 
 #include <stdlib.h>
 #include <pthread.h>
-#include "erlojua.h"
-#include "prozesuak.h"
+#include "clock.h"
+#include "process.h"
 #include "cpu.h"
 #include "scheduler.h"
 int main () {
@@ -11,27 +11,26 @@ int main () {
 	
 	//clock
 	pthread_t clockthread; 
-        pthread_create(&clockthread, NULL, erlojua, NULL);
+        pthread_create(&clockthread, NULL, clk, NULL);
         
 	//scheduler
 	pthread_t sthread; 
         pthread_create(&sthread, NULL, scheduler, NULL);
        
 	//temps
-	pthread_t* temporizadoreak = calloc(tmpCount, sizeof(pthread_t));	
-	struct temp_arg* argumentuak = calloc(tmpCount, sizeof(struct temp_arg));
-	argumentuak[0].maiztasuna = 6;
-	argumentuak[0].funtzioa = call_scheduler;
-	argumentuak[1].maiztasuna = 10;
-	argumentuak[1].funtzioa = prozesu_add_ready;
-	argumentuak[2].maiztasuna = 600;
-        pthread_create(&temporizadoreak[0], NULL, tenporizadorea, &argumentuak[0]);
-        pthread_create(&temporizadoreak[1], NULL, tenporizadorea, &argumentuak[1]);
-        pthread_create(&temporizadoreak[2], NULL, tenporizadorea, &argumentuak[2]);
+	pthread_t* stopwatches = calloc(tmpCount, sizeof(pthread_t));	
+	struct temp_arg* arguments = calloc(tmpCount, sizeof(struct temp_arg));
+	arguments[0].frequency = 6;
+	arguments[0].function = call_scheduler;
+	arguments[1].frequency = 10;
+	arguments[1].function = process_add_ready;
+	arguments[2].frequency = 600;
+        pthread_create(&stopwatches[0], NULL, stopwatch, &arguments[0]);
+        pthread_create(&stopwatches[1], NULL, stopwatch, &arguments[1]);
+        pthread_create(&stopwatches[2], NULL, stopwatch, &arguments[2]);
 	
         pthread_exit(NULL);
-        free(temporizadoreak);
-        free(argumentuak);
-	
+        free(stopwatches);
+        free(arguments);
 }
 
