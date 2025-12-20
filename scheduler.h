@@ -1,3 +1,6 @@
+#ifndef SCHEDULER_H
+#define SCHEDULER_H
+
 #include <semaphore.h>
 #include <stdio.h>
 #include "process.h"
@@ -5,3 +8,5 @@
 extern sem_t mutexS;
 void *scheduler(void *args);
 void call_scheduler();
+
+#endif

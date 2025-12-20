@@ -6,6 +6,7 @@ struct PCB {
     int id;
     int priority;
     int lastTime;
+    struct page_entry *page_entry;
 };
 struct process_node {
     struct PCB pcb;
