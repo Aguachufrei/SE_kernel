@@ -1,9 +1,15 @@
 #ifndef PROCESS_H
 #define PROCESS_H
+
 #include <stdlib.h>
 #include <stdio.h>
+#include <pthread.h>
+#include <stdint.h>
+
 struct PCB {
     int id;
+    uint32_t ir;
+    uint32_t pc;
     int priority;
     int lastTime;
     struct page_entry *page_entry;
@@ -30,4 +36,5 @@ struct process_node *process_get_next(struct process_node *nodoa);
 struct PCB *process_destroy_next(struct process_queue *queue, struct process_node *nodoa);
 void process_print(struct process_queue *q);
 void process_print_pages(struct PCB *pcb);
+
 #endif

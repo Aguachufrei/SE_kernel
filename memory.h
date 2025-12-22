@@ -18,7 +18,7 @@ extern uint8_t bitmap[PAGE_NUM]; //Bool
 void meminit();
 uint32_t memory_alloc();
 void memory_free(uint32_t page);
-uint32_t memory_translate(struct PCB *pcb, unt32_t logic_addr);
+uint32_t memory_translate(struct PCB *pcb, uint32_t logic_addr);
 struct page_entry {
 	uint8_t physical_page;
 	uint8_t free; //1 free; 2 ocupied;

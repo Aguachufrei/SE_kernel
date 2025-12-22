@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <pthread.h>
+#include <stdint.h>
 #include "process.h"
 #include "memory.h" 
 #include "clock.h"
@@ -114,13 +115,12 @@ void process_alloc_multiple(struct PCB *pcb, int num){
 		pcb->page_entry[i].physical_page = page;
 		pcb->page_entry[i].free = 1;
 	}
-
 }
 
 
 void process_free_multiple(struct PCB pcb){
 	for(int i = 0; i<PAGE_NUM; i++){
-	
+		pcb.page_entry[i].free = 0;	
 	}
 }
 
@@ -156,7 +156,7 @@ void process_print(struct process_queue *queue){
 
 void process_print_pages(struct PCB *pcb){
 	printf("\nprocessing page printing request by process with id %d\n", pcb->id);
-	for( int i = 0; i<PAGE_NUM; i++){{
+	for( int i = 0; i<PAGE_NUM; i++){
 		if(!pcb->page_entry[i].free)
 			printf("page %d allocated");
 	}
