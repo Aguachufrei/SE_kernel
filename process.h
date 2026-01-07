@@ -46,6 +46,7 @@ void process_alloc_multiple(struct PCB *pcb, int num);
 void process_free_multiple(struct PCB *pcb);
 void process_read(struct PCB *pcb, uint32_t vaddr, uint8_t *buffer, long size);
 void process_write(struct PCB *pcb, uint32_t vaddr, uint8_t *buffer, long size);
+void process_destroy(struct PCB *pcb);
 void process_execute(struct PCB *pcb);
 void process_instructions();
 void process_print(struct process_queue *q);

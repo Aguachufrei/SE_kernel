@@ -64,6 +64,8 @@ void process_loader(struct process_queue *queue, uint8_t *name, int priority){
 	node->pcb->priority = priority%100;
 	node->pcb->lastTime = se_time;
 
+	
+
 	//first two lines became "pointers"
 	uint8_t buffer[32];
 	if(fgets(buffer, 32, f))node->pcb->text = (uint32_t)strtoul(buffer + 6, NULL, 16);
@@ -99,8 +101,10 @@ void process_loader(struct process_queue *queue, uint8_t *name, int priority){
 		realSize++;
 	}
 	size = realSize;
+#ifdef DATA
+	printf("\nDATA FOR PROCESS WITH PID %d\n", node->pcb->id);
 	process_print_hex(data, size);
-
+#endif
 	//create the virtual memory
 	node->pcb->page_entry = malloc(PAGE_NUM*sizeof(struct page_entry));
 	for(int i = 0; i < PAGE_NUM; i++){
@@ -252,7 +256,19 @@ void process_write(struct PCB *pcb, uint32_t vaddr, uint8_t *buffer, long size){
 		bytes_processed += bytes_to_process;
 	}
 }
-
+void process_destroy(struct PCB *pcb){
+	for(int i = 0; i < PAGE_NUM; i++){
+		if(pcb->page_entry[i].free){
+			memory_free(pcb->page_entry[i].physical_page);
+		}
+	}
+	int id = pcb->id;
+	free(pcb->page_entry);
+	free(pcb);
+#ifdef DEND
+	printf("Process %d freed\n", id);
+#endif
+}
 /////////////
 //Execution//
 /////////////
@@ -262,11 +278,12 @@ void process_execute(struct PCB *pcb){
 	process_read(pcb, pcb->pc, buffer, 4);
 	pcb->ir = (buffer[0] << 24) | (buffer[1] << 16) | (buffer[2] << 8) | buffer[3];
 	pcb->pc+=4;
-	printf("Data to execute for pid %d\n", pcb->id);
-	printf("%08X\n", pcb->ir);
 	uint8_t instruction = (pcb->ir >> 28) & 0x0F; 
+#ifdef INST
+	printf("\nData to execute for pid %d\n", pcb->id);
+	printf("%08X\n", pcb->ir);
 	printf("INSTRUCTION: %d\n", instruction);
-
+#endif
 	uint8_t rx, ry, rz;
 	uint32_t vaddr;
 
@@ -277,7 +294,9 @@ void process_execute(struct PCB *pcb){
 			vaddr = pcb->ir & 0x00FFFFFF; 
 			process_read(pcb, vaddr, buffer, 4);
 			pcb->registers[rx] = (buffer[0] << 24) | (buffer[1] << 16) | (buffer[2] << 8) | buffer[3];
+#ifdef INST
 			printf("ld r%d, %6X\n", rx, vaddr);
+#endif
 			break;
 		case 1:
 			//st rx vaddr
@@ -288,27 +307,33 @@ void process_execute(struct PCB *pcb){
 			buffer[2] = (uint8_t)(pcb->registers[rx]>>8);
 			buffer[3] = (uint8_t)(pcb->registers[rx]); 
 			process_write(pcb, vaddr, buffer, 4);
+#ifdef INST
 			printf("st r%d, %6X\n", rx, vaddr);
-
+#endif
 			break;
 		case 2:
 			//add rx, ry, rz
 			rx = pcb->ir>>24 & 0x0F;
 			ry = pcb->ir>>20 & 0x0F;
 			rz = pcb->ir>>16 & 0x0F;
-			printf("add r%d, r%d, r%d\n", rx, ry ,rz);
 			pcb->registers[rx] = pcb->registers[ry] + pcb->registers[rz]; 
-
+#ifdef INST
+			printf("add r%d, r%d, r%d\n", rx, ry ,rz);
+#endif
 			break;
 		case 15:
 			//exit
+#ifdef INST
 			printf("exit\n");
+#endif
 			uint8_t *buff = malloc(pcb->end-pcb->data);
 			process_read(pcb, pcb->data, buff, pcb->end-pcb->data);
+#ifdef DEND
+			printf("\nRESULT OF PROCESS %d\n",pcb->id);
 			process_print_hex(buff, (pcb->end-pcb->data)/4);
+#endif
 			pcb->hasCode=0;
-
-
+			free(buff);
 			break;
 		default:
 			printf("instruction is unknown\n");
@@ -318,12 +343,13 @@ void process_execute(struct PCB *pcb){
 
 
 void process_instructions(){
-	for(int i = 0; i < cpu.coreNum; i++){
+	pthread_mutex_lock(&cpu_mutex);	for(int i = 0; i < cpu.coreNum; i++){
 		for(int j = 0; j < cpu.hthreadNum; j++){
 			if(cpu.cores[i][j]==NULL||cpu.cores[i][j]->hasCode==false)continue;
 			process_execute(cpu.cores[i][j]);	
 		}
 	}
+	pthread_mutex_unlock(&cpu_mutex);
 }
 
 

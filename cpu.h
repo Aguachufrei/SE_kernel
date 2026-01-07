@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include "process.h"
 extern struct CPU cpu;
+extern pthread_mutex_t cpu_mutex;
 struct CPU {
 	int coreNum;
 	int hthreadNum;

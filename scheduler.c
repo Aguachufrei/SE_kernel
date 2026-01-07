@@ -10,15 +10,23 @@ void *scheduler(void *args) {
 	sem_init(&mutexS, 1, 0);
 	while(1) {
 		sem_wait(&mutexS);
-
+		pthread_mutex_lock(&cpu_mutex);
 		//Prozesagailuen dauden aginduak berreskuratu
 		for(int i = 0; i<cpu.coreNum; i++){
 			for(int j = 0; j<cpu.hthreadNum; j++){
 				if(cpu.cores[i][j]==NULL)continue;
+				if(!cpu.cores[i][j]->hasCode){
+					process_destroy(cpu.cores[i][j]);
+					cpu.cores[i][j] = NULL;
+					continue;
+				}
 				process_push(&ready, cpu.cores[i][j]);
+				cpu.cores[i][j] = NULL;
 			}
 		}
-		//process_print(&ready);
+#ifdef QUEE
+		process_print(&ready);
+#endif
 		for(int i = 0; i<cpu.coreNum; i++){
 			for(int j = 0; j<cpu.hthreadNum; j++){
 				
@@ -47,14 +55,21 @@ void *scheduler(void *args) {
 				} else { 
 					bestpcb = process_destroy_next(&ready, previousBest);
 				}
-				//process_print(&ready);
 				cpu.cores[i][j]=bestpcb;
+#ifdef QUEP
+				process_print(&ready);
+				printf("Best process is: %d, priority (%d) \n\n", bestpcb->id, max_value);
+#endif
 			}
 		}
+		pthread_mutex_unlock(&cpu_mutex);
 	}
 }
 
 
 void call_scheduler(){
+#ifdef INIT
+	printf("scheduler initialized\n");
+#endif
 	sem_post(&mutexS);
 }

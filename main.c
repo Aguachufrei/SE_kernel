@@ -10,6 +10,8 @@ int main () {
 	
 	cpu_inicialize(4, 2);	
 	meminit();
+
+	//loader
 	for(int i = 0; i<9; i++){
 		char str1[21];
 		sprintf(str1, "../files/prog00%d.elf", i);
@@ -20,6 +22,7 @@ int main () {
 		sprintf(str1, "../files/prog0%d.elf", i);
 		process_loader(&ready, str1, 99);
 	}
+
 	//clock
 	pthread_t clockthread; 
         pthread_create(&clockthread, NULL, clk, NULL);
@@ -41,15 +44,6 @@ int main () {
         pthread_create(&stopwatches[1], NULL, stopwatch, &arguments[1]);
         pthread_create(&stopwatches[2], NULL, stopwatch, &arguments[2]);
 
-
-	//PRUEBAS
-	
-	int p1 = memory_alloc();
-	int p2 = memory_alloc();
-	printf("%d:%d", p1, p2);
-	memory_free(p1);	
-	
-	
 	
         pthread_exit(NULL);
         free(stopwatches);
