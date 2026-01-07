@@ -14,12 +14,12 @@ int main () {
 	//loader
 	for(int i = 0; i<9; i++){
 		char str1[21];
-		sprintf(str1, "../files/prog00%d.elf", i);
+		sprintf(str1, "files/prog00%d.elf", i);
 		process_loader(&ready, str1, 99);
 	}
 	for(int i = 10; i<40; i++){
 		char str1[21];
-		sprintf(str1, "../files/prog0%d.elf", i);
+		sprintf(str1, "files/prog0%d.elf", i);
 		process_loader(&ready, str1, 99);
 	}
 
